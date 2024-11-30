@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { pokeApi } from "../services/axios";
 import type {
+  ApiEvolutionChainResponse,
   ApiPokemonResponse,
   ApiResourceListResponse,
   ApiSpeciesResponse,
@@ -26,17 +27,12 @@ export const usePokemonStore = defineStore("pokemons", () => {
       }
 
       const pokemonsPromises = listResponse.data.results.map(async (pokemon) =>
-        fetchPokemon(pokemon.url),
+        fetchPokemon(pokemon.name),
       );
       const pokemonsResponses = await Promise.allSettled(pokemonsPromises);
-      pokemonsResponses
+      pokemons.value = pokemonsResponses
         .filter((pr) => pr.status === "fulfilled")
-        .forEach((pr) => {
-          if (!pr.value) {
-            return;
-          }
-          pokemons.value.push(transformPokemon(pr.value));
-        });
+        .map((pr) => pr.value);
 
       return {
         ok: true,
@@ -49,29 +45,61 @@ export const usePokemonStore = defineStore("pokemons", () => {
     }
   }
 
-  async function fetchPokemon(url: string) {
+  async function fetchPokemon(id: number | string): Promise<Pokemon> {
     try {
-      const pokemonResponse = await pokeApi<ApiPokemonResponse>(url);
+      const pokemonResponse = await pokeApi<ApiPokemonResponse>(
+        "pokemon/" + id,
+      );
       if (!pokemonResponse) {
-        throw new Error("");
+        throw new Error("Error fetching pokemon: " + id);
       }
-      return pokemonResponse.data;
+      const species = await fetchSpecies(pokemonResponse.data.id);
+      if (!species) {
+        throw new Error("Error fetching species: " + id);
+      }
+      const evolutionChain = await fetchEvolutionChain(pokemonResponse.data.id);
+      if (!evolutionChain) {
+        throw new Error("Error fetching evolution chain: " + id);
+      }
+
+      const transformedPokemon = transformPokemon(
+        pokemonResponse.data,
+        species,
+        evolutionChain,
+      );
+
+      return transformedPokemon;
     } catch (e) {
       console.error(e);
-      return null;
+      throw e;
     }
   }
 
-  async function fetchSpecies(url: string) {
+  async function fetchSpecies(id: number) {
     try {
-      const speciesResponse = await pokeApi<ApiSpeciesResponse>(url);
+      const speciesResponse = await pokeApi<ApiSpeciesResponse>(
+        "pokemon-species/" + id,
+      );
       if (!speciesResponse) {
         throw new Error("");
       }
       return speciesResponse.data;
     } catch (e) {
-      console.error(e);
-      return null;
+      throw e;
+    }
+  }
+
+  async function fetchEvolutionChain(id: number) {
+    try {
+      const speciesResponse = await pokeApi<ApiEvolutionChainResponse>(
+        "evolution-chain/" + id,
+      );
+      if (!speciesResponse) {
+        throw new Error("");
+      }
+      return speciesResponse.data;
+    } catch (e) {
+      throw e;
     }
   }
 

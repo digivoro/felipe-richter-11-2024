@@ -8,12 +8,12 @@ export interface ApiResourceListResponse {
 }
 
 export interface ApiPokemonResponse extends BasePokemon<_ApiStats, _ApiTypes> {
-  species: {
-    url: string;
-  };
   sprites: {
     front_default: string;
     other?: any;
+  };
+  cries: {
+    latest: string;
   };
   stats: _ApiStats[];
   types: _ApiTypes[];
@@ -26,7 +26,15 @@ export interface ApiSpeciesResponse {
 }
 
 export interface ApiEvolutionChainResponse {
-  chain: _ApiChainLink;
+  chain: ApiChainLink;
+}
+
+export interface ApiChainLink {
+  evolves_to: ApiChainLink[];
+  species: {
+    name: string;
+    url: string;
+  };
 }
 
 // Internal
@@ -40,7 +48,7 @@ interface _ApiNamedResource extends _ApiResource {
 
 interface _ApiStats {
   base_stat: number;
-  stat: { 
+  stat: {
     name: string;
   };
 }
@@ -50,12 +58,4 @@ interface _ApiTypes {
   type: {
     name: string;
   };
-}
-
-interface _ApiChainLink {
-  evolves_to: _ApiChainLink;
-  species: {
-    name: string;
-    url: string;
-  }
 }
