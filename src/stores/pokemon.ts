@@ -1,11 +1,13 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { pokeApi } from "../services/axios"
 import type { PokeApiResponse, Pokemon } from "@/types";
 
 export const usePokemonStore = defineStore("pokemons", () => {
   const pokemons = ref<Pokemon[]>([]);
   const myTeam = ref<Pokemon[]>([]);
+  
+  const isMyTeamFull = computed<Boolean>(() => myTeam.value.length >= 6);
 
   async function fetchPokemons(limit: number = 25, offset: number = 0) {
     try {
@@ -50,6 +52,9 @@ export const usePokemonStore = defineStore("pokemons", () => {
   }
 
   function addToMyTeam(pokemon: Pokemon) {
+    if (isMyTeamFull.value) {
+      return;
+    }
     myTeam.value.push(pokemon);
   }
   
@@ -58,8 +63,11 @@ export const usePokemonStore = defineStore("pokemons", () => {
   }
 
   return {
+    // State & Getters
     pokemons,
     myTeam,
+    isMyTeamFull,
+    // Actions
     fetchPokemons,
     addToMyTeam,
     removeFromMyTeam,
