@@ -5,6 +5,7 @@ import type { PokeApiResponse, Pokemon } from "@/types";
 
 export const usePokemonStore = defineStore("pokemons", () => {
   const pokemons = ref<Pokemon[]>([]);
+  const myTeam = ref<Pokemon[]>([]);
 
   async function fetchPokemons(limit: number = 25, offset: number = 0) {
     try {
@@ -48,8 +49,19 @@ export const usePokemonStore = defineStore("pokemons", () => {
     }
   }
 
+  function addToMyTeam(pokemon: Pokemon) {
+    myTeam.value.push(pokemon);
+  }
+  
+  function removeFromMyTeam(pokemon: Pokemon) {
+    myTeam.value.splice(myTeam.value.indexOf(pokemon), 1);
+  }
+
   return {
     pokemons,
+    myTeam,
     fetchPokemons,
+    addToMyTeam,
+    removeFromMyTeam,
   };
 });
