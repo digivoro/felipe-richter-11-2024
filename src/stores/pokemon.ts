@@ -1,19 +1,26 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { pokeApi } from "../services/axios"
-import type { PokeApiResponse, Pokemon } from "@/types";
+import { pokeApi } from "../services/axios";
+import type {
+  ApiPokemonResponse,
+  ApiResourceListResponse,
+  ApiSpeciesResponse,
+  Pokemon,
+} from "@/types";
+import { transformPokemon } from "@/utils/transform";
 
 export const usePokemonStore = defineStore("pokemons", () => {
   const pokemons = ref<Pokemon[]>([]);
   const myTeam = ref<Pokemon[]>([]);
-  
+  const next = ref<string | null>(null);
+  const prev = ref<string | null>(null);
+
   const isMyTeamFull = computed<Boolean>(() => myTeam.value.length >= 6);
 
-  async function fetchPokemons(limit: number = 25, offset: number = 0) {
+  async function fetchPokemons(limit = 25, offset = 0) {
     try {
-      const listResponse = await pokeApi<PokeApiResponse>(
-        `pokemon?limit=${limit}&offset=${offset}`
-      );
+      const url = `pokemon?limit=${limit}&offset=${offset}`;
+      const listResponse = await pokeApi<ApiResourceListResponse>(url);
       if (!listResponse) {
         throw new Error("Error fetching pokemon list");
       }
@@ -22,10 +29,14 @@ export const usePokemonStore = defineStore("pokemons", () => {
         fetchPokemon(pokemon.url),
       );
       const pokemonsResponses = await Promise.allSettled(pokemonsPromises);
-      const pokemonsData = pokemonsResponses
+      pokemonsResponses
         .filter((pr) => pr.status === "fulfilled")
-        .map((pr) => pr.value);
-      pokemons.value = pokemonsData;
+        .forEach((pr) => {
+          if (!pr.value) {
+            return;
+          }
+          pokemons.value.push(transformPokemon(pr.value));
+        });
 
       return {
         ok: true,
@@ -40,13 +51,26 @@ export const usePokemonStore = defineStore("pokemons", () => {
 
   async function fetchPokemon(url: string) {
     try {
-      const pokemonResponse = await fetch(url, { method: "GET" });
-      if (!pokemonResponse.ok) {
+      const pokemonResponse = await pokeApi<ApiPokemonResponse>(url);
+      if (!pokemonResponse) {
         throw new Error("");
       }
-      return await pokemonResponse.json();
+      return pokemonResponse.data;
     } catch (e) {
-      console.error(`Error fetching ${url}:`);
+      console.error(e);
+      return null;
+    }
+  }
+
+  async function fetchSpecies(url: string) {
+    try {
+      const speciesResponse = await pokeApi<ApiSpeciesResponse>(url);
+      if (!speciesResponse) {
+        throw new Error("");
+      }
+      return speciesResponse.data;
+    } catch (e) {
+      console.error(e);
       return null;
     }
   }
@@ -57,7 +81,7 @@ export const usePokemonStore = defineStore("pokemons", () => {
     }
     myTeam.value.push(pokemon);
   }
-  
+
   function removeFromMyTeam(pokemon: Pokemon) {
     myTeam.value.splice(myTeam.value.indexOf(pokemon), 1);
   }
@@ -67,6 +91,8 @@ export const usePokemonStore = defineStore("pokemons", () => {
     pokemons,
     myTeam,
     isMyTeamFull,
+    prev,
+    next,
     // Actions
     fetchPokemons,
     addToMyTeam,

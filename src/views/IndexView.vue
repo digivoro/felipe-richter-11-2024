@@ -24,7 +24,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="px-4 py-6">
+  <div>
     <div
       class="flex items-center text mb-4 py-2 px-4 font-medium bg-info rounded shadow-[rgba(0,0,0,0.2)] shadow-md"
     >

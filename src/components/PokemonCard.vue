@@ -37,7 +37,7 @@ function onToggleFromTeam() {
     }"
     role="button"
     :style="{
-      backgroundImage: `url(${pokemon.sprites.front_default})`,
+      backgroundImage: `url(${pokemon.sprite})`,
     }"
     @click="onToggleFromTeam"
   >
