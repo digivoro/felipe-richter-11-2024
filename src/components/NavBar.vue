@@ -1,9 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import AppLogo from "./AppLogo.vue";
+</script>
 
 <template>
   <nav class="p-4 bg-primary">
     <RouterLink to="/" class="hover:cursor-pointer">
-      <div class="text-lg font-bold text-primary-content">PokeDesafío</div>
+      <AppLogo />
     </RouterLink>
   </nav>
 </template>
