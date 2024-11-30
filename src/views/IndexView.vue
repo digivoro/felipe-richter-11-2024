@@ -25,7 +25,7 @@ onMounted(async () => {
       class="flex items-center text mb-4 py-2 px-4 font-medium bg-info rounded shadow-[rgba(0,0,0,0.2)] shadow-md"
     >
       <IconInfo class="size-4 mr-2" />
-      Select your Pokèmon team from the list
+      Select your Pokémon team from the list
     </h1>
     <template v-for="pokemon in pokemonStore.pokemons" :key="pokemon.id">
       <PokemonCard class="mb-6" :pokemon="pokemon" />
