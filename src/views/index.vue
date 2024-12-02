@@ -2,7 +2,6 @@
 import { onMounted, ref } from "vue";
 import { usePokemonStore } from "../stores/pokemon";
 import PokemonCard from "@/components/PokemonCard.vue";
-import IconInfo from "@/components/icons/IconInfo.vue";
 import BottomNavBar from "@/components/BottomNavBar.vue";
 import SectionTitle from "@/components/SectionTitle.vue";
 
