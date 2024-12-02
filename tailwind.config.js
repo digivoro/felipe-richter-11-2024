@@ -1,8 +1,11 @@
 module.exports = {
-  purge: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
-  darkMode: false,
+  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+  safelist: [{ pattern: /^bg-poke-*/ }],
   theme: {
     extend: {
+      animation: {
+        "spin-slow": "spin 3s linear infinite",
+      },
       colors: {
         primary: "#44adee",
         secondary: "#e74689",
