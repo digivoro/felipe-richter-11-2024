@@ -1,3 +1,4 @@
+import { usePokemonStore } from "@/stores/pokemon";
 import type { RouteRecordRaw } from "vue-router";
 
 export const routes: RouteRecordRaw[] = [
@@ -19,7 +20,13 @@ export const routes: RouteRecordRaw[] = [
         name: "TeamDetails",
         component: () => import("@/views/team/Details.vue"),
         beforeEnter: (to, from, next) => {
-          // TODO: Validate id param
+          const pokemonStore = usePokemonStore();
+          const isIdValid = pokemonStore.myTeam.some(
+            (pokemon) => pokemon.id === +to.params.id,
+          );
+          if (!isIdValid) {
+            return next("/");
+          }
           next();
         },
       },
