@@ -13,16 +13,6 @@
       stroke-linecap="round"
       stroke-linejoin="round"
     >
-      <!-- <defs>
-        <style>
-          .d {
-            fill: none;
-            stroke: #000000;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-          }
-        </style>
-      </defs> -->
       <path
         class="d"
         d="m5.5008,35.6714c-.0005-.0572-.0008-.1145-.0008-.1718,0-10.2173,8.2827-18.5,18.5-18.5s18.5,8.2827,18.5,18.5c0,.0573-.0003.1146-.0008.1718"
