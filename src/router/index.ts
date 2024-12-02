@@ -1,18 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { routes } from "./routes";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: "/",
-      name: "home",
-      component: () => import("../views/IndexView.vue"),
-    },
-    {
-      path: "/team",
-      component: () => import("../views/TeamView.vue"),
-    },
-  ],
+  routes,
+  scrollBehavior: (to, from, savedPosition) => {
+    return { top: 0, behavior: "smooth" };
+  },
 });
 
 export default router;
