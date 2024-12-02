@@ -4,6 +4,7 @@ import { usePokemonStore } from "../stores/pokemon";
 import PokemonCard from "@/components/PokemonCard.vue";
 import IconInfo from "@/components/icons/IconInfo.vue";
 import BottomNavBar from "@/components/BottomNavBar.vue";
+import SectionTitle from "@/components/SectionTitle.vue";
 
 const pokemonStore = usePokemonStore();
 const error = ref<string | null>(null);
@@ -25,12 +26,7 @@ onMounted(async () => {
 
 <template>
   <div>
-    <div
-      class="flex items-center text mb-4 py-2 px-4 font-medium bg-info rounded shadow-[rgba(0,0,0,0.2)] shadow-md"
-    >
-      <IconInfo class="size-4 mr-2" />
-      Select your Pokémon team from the list
-    </div>
+    <SectionTitle class="mb-8">Select your Pokémon team</SectionTitle>
     <PokemonCard
       v-for="pokemon in pokemonStore.pokemons"
       :key="pokemon.id"
