@@ -17,12 +17,14 @@ export interface ApiPokemonResponse extends BasePokemon<_ApiStats, _ApiTypes> {
   };
   stats: _ApiStats[];
   types: _ApiTypes[];
+  species: _ApiNamedResource;
 }
 
 export interface ApiSpeciesResponse {
   flavor_text_entries: {
     flavor_text: string;
   }[];
+  evolution_chain: string;
 }
 
 export interface ApiEvolutionChainResponse {
@@ -31,10 +33,7 @@ export interface ApiEvolutionChainResponse {
 
 export interface ApiChainLink {
   evolves_to: ApiChainLink[];
-  species: {
-    name: string;
-    url: string;
-  };
+  species: _ApiNamedResource;
 }
 
 // Internal

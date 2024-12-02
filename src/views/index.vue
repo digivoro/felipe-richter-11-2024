@@ -1,12 +1,21 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
 import { usePokemonStore } from "../stores/pokemon";
 import PokemonCard from "@/components/PokemonCard.vue";
 import BottomNavBar from "@/components/BottomNavBar.vue";
 import SectionTitle from "@/components/SectionTitle.vue";
+import { storeToRefs } from "pinia";
 
 const pokemonStore = usePokemonStore();
-const error = ref<string | null>(null);
+const { currentPage, lastPage, pageRange } = storeToRefs(pokemonStore);
+
+async function onChangePage(direction: "prev" | "next") {
+  try {
+    await pokemonStore.changePage(direction);
+  } catch (err) {
+    console.error(err);
+  }
+}
 
 onMounted(async () => {
   try {
@@ -17,22 +26,28 @@ onMounted(async () => {
     if (!response.ok) {
       throw new Error("There was an error ");
     }
-  } catch (e: any) {
-    error.value = e instanceof Error ? e.message : e;
+  } catch (err: any) {
+    console.error(err);
   }
 });
 </script>
 
 <template>
-  <div>
-    <SectionTitle class="mb-8">Select your Pokémon team</SectionTitle>
+  <div class="pt-4">
+    <SectionTitle class="mb-2">Select your Pokémon team</SectionTitle>
+    <div class="text-center uppercase mb-8 font-bold">
+      Page {{ currentPage }}/{{ lastPage }}
+    </div>
     <PokemonCard
-      v-for="pokemon in pokemonStore.pokemons"
+      v-for="pokemon in pokemonStore.pokemons.slice(
+        pageRange.start,
+        pageRange.end,
+      )"
       :key="pokemon.id"
       class="mb-6"
       :pokemon="pokemon"
     />
   </div>
 
-  <BottomNavBar />
+  <BottomNavBar @change-page="onChangePage" />
 </template>

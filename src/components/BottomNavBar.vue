@@ -2,17 +2,27 @@
 import { usePokemonStore } from "@/stores/pokemon";
 import { storeToRefs } from "pinia";
 import IconPokeball from "./icons/IconPokeball.vue";
+import IconNext from "./icons/IconNext.vue";
+import PaginationButton from "./PaginationButton.vue";
+import { computed } from "vue";
 
 const pokemonStore = usePokemonStore();
-const { myTeam, isMyTeamFull } = storeToRefs(pokemonStore);
+const { myTeam, isMyTeamFull, currentPage, lastPage } =
+  storeToRefs(pokemonStore);
 </script>
 
 <template>
-  <nav class="w-full pb-2 px-2 fixed bottom-0 left-0 flex justify-center">
+  <nav class="w-full pb-2 px-2 fixed bottom-0 left-0 flex justify-between">
     <!-- Prev -->
-    <!-- <PaginationButton class="rotate-180">
-      <IconNext />
-    </PaginationButton> -->
+    <PaginationButton
+      @click="$emit('change-page', 'prev')"
+      :disabled="currentPage <= 1"
+    >
+      <template #icon>
+        <IconNext class="rotate-180" />
+      </template>
+      PREV
+    </PaginationButton>
 
     <!-- My team -->
     <RouterLink
@@ -31,7 +41,8 @@ const { myTeam, isMyTeamFull } = storeToRefs(pokemonStore);
             :key="n"
             class="size-6 transition-all duration-500 ease-out"
             :class="{
-              'text-base-100 opacity-100 animate-spin-slow': n <= myTeam.length,
+              'text-base-100 opacity-100': n <= myTeam.length,
+              'animate-spin-slow': n <= myTeam.length && !isMyTeamFull,
               'opacity-50': n > myTeam.length,
             }"
           />
@@ -46,8 +57,14 @@ const { myTeam, isMyTeamFull } = storeToRefs(pokemonStore);
     </RouterLink>
 
     <!-- Next -->
-    <!-- <PaginationButton>
-      <IconNext />
-    </PaginationButton> -->
+    <PaginationButton
+      @click="$emit('change-page', 'next')"
+      :disabled="currentPage === lastPage"
+    >
+      <template #icon>
+        <IconNext />
+      </template>
+      NEXT
+    </PaginationButton>
   </nav>
 </template>

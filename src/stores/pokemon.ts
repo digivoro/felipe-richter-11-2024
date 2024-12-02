@@ -11,29 +11,43 @@ import type {
 import { transformPokemon } from "@/utils/transform";
 
 export const usePokemonStore = defineStore("pokemons", () => {
+  // Pokemon data
   const pokemons = ref<Pokemon[]>([]);
-  const myTeam = ref<Pokemon[]>([]);
-  const next = ref<string | null>(null);
-  const prev = ref<string | null>(null);
+  const fetchedPokemons = ref<Map<string, Pokemon>>(new Map());
 
-  const isMyTeamFull = computed<Boolean>(() => myTeam.value.length >= 6);
-
-  async function fetchPokemons(limit = 25, offset = 0) {
+  async function fetchPokemons(url: string = "pokemon?limit=25&offset=0") {
     try {
-      const url = `pokemon?limit=${limit}&offset=${offset}`;
       const listResponse = await pokeApi<ApiResourceListResponse>(url);
       if (!listResponse) {
         throw new Error("Error fetching pokemon list");
       }
 
-      const pokemonsPromises = listResponse.data.results.map(async (pokemon) =>
-        fetchPokemon(pokemon.name),
-      );
-      const pokemonsResponses = await Promise.allSettled(pokemonsPromises);
-      pokemons.value = pokemonsResponses
-        .filter((pr) => pr.status === "fulfilled")
-        .map((pr) => pr.value);
+      function isValidPokemon(pokemonUrl: string) {
+        const pokemonId = pokemonUrl
+          .split("/")
+          .filter((segment) => segment !== "" && !isNaN(Number(segment)))[0];
+        return +pokemonId <= MAX_POKEMON;
+      }
 
+      const unfetchedPokemonPromises = listResponse.data.results
+        .filter((pokemon) => !fetchedPokemons.value.has(pokemon.name))
+        .filter((pokemon) => isValidPokemon(pokemon.url))
+        .map(async (pokemon) => fetchPokemon(pokemon.url));
+
+      const pokemonsResponses = await Promise.all(unfetchedPokemonPromises);
+
+      if (!pokemonsResponses) {
+        throw new Error("Failed to fetch pokemon batch: " + url);
+      }
+
+      pokemonsResponses.forEach((pokemon) => {
+        pokemons.value.push(pokemon);
+        fetchedPokemons.value.set(pokemon.name, pokemon);
+        fetchedPokemons.value.set(pokemon.id.toString(), pokemon);
+      });
+
+      next.value = listResponse.data.next;
+      prev.value = listResponse.data.previous;
       return {
         ok: true,
       };
@@ -44,22 +58,26 @@ export const usePokemonStore = defineStore("pokemons", () => {
       };
     }
   }
-
-  async function fetchPokemon(id: number | string): Promise<Pokemon> {
+  async function fetchPokemon(url: string): Promise<Pokemon> {
+    // console.log(url);
     try {
-      const pokemonResponse = await pokeApi<ApiPokemonResponse>(
-        "pokemon/" + id,
-      );
+      const pokemonResponse = await pokeApi<ApiPokemonResponse>(url);
       if (!pokemonResponse) {
-        throw new Error("Error fetching pokemon: " + id);
+        throw new Error("Error fetching pokemon: " + url);
       }
-      const species = await fetchSpecies(pokemonResponse.data.id);
+
+      const species = await fetchSpecies(pokemonResponse.data.species.url);
       if (!species) {
-        throw new Error("Error fetching species: " + id);
+        throw new Error(
+          "Error fetching species: " + pokemonResponse.data.species.url,
+        );
       }
-      const evolutionChain = await fetchEvolutionChain(pokemonResponse.data.id);
+
+      const evolutionChain = await fetchEvolutionChain(species.evolution_chain);
       if (!evolutionChain) {
-        throw new Error("Error fetching evolution chain: " + id);
+        throw new Error(
+          "Error fetching evolution chain: " + species.evolution_chain,
+        );
       }
 
       const transformedPokemon = transformPokemon(
@@ -67,6 +85,9 @@ export const usePokemonStore = defineStore("pokemons", () => {
         species,
         evolutionChain,
       );
+      if (url === "https://pokeapi.co/api/v2/pokemon/151/") {
+        console.log(transformedPokemon);
+      }
 
       return transformedPokemon;
     } catch (e) {
@@ -74,12 +95,9 @@ export const usePokemonStore = defineStore("pokemons", () => {
       throw e;
     }
   }
-
-  async function fetchSpecies(id: number) {
+  async function fetchSpecies(url: string) {
     try {
-      const speciesResponse = await pokeApi<ApiSpeciesResponse>(
-        "pokemon-species/" + id,
-      );
+      const speciesResponse = await pokeApi<ApiSpeciesResponse>(url);
       if (!speciesResponse) {
         throw new Error("");
       }
@@ -88,20 +106,21 @@ export const usePokemonStore = defineStore("pokemons", () => {
       throw e;
     }
   }
-
-  async function fetchEvolutionChain(id: number) {
+  async function fetchEvolutionChain(url: string) {
     try {
-      const speciesResponse = await pokeApi<ApiEvolutionChainResponse>(
-        "evolution-chain/" + id,
-      );
-      if (!speciesResponse) {
+      const evolutionResponse = await pokeApi<ApiEvolutionChainResponse>(url);
+      if (!evolutionResponse) {
         throw new Error("");
       }
-      return speciesResponse.data;
+      return evolutionResponse.data;
     } catch (e) {
       throw e;
     }
   }
+
+  // My team
+  const myTeam = ref<Pokemon[]>([]);
+  const isMyTeamFull = computed<Boolean>(() => myTeam.value.length >= 6);
 
   function addToMyTeam(pokemon: Pokemon) {
     if (isMyTeamFull.value) {
@@ -109,9 +128,36 @@ export const usePokemonStore = defineStore("pokemons", () => {
     }
     myTeam.value.push(pokemon);
   }
-
   function removeFromMyTeam(pokemon: Pokemon) {
     myTeam.value.splice(myTeam.value.indexOf(pokemon), 1);
+  }
+
+  // Pagination
+  const PAGE_SIZE = +import.meta.env.VITE_PAGE_SIZE;
+  const MAX_POKEMON = +import.meta.env.VITE_MAX_POKEMON;
+
+  const next = ref<string | null>(null);
+  const prev = ref<string | null>(null);
+  const lastPage = ref(Math.ceil(MAX_POKEMON / PAGE_SIZE));
+  const currentPage = ref(1);
+
+  const pageRange = computed(() => ({
+    start: (currentPage.value - 1) * PAGE_SIZE,
+    end: currentPage.value * PAGE_SIZE,
+  }));
+
+  async function changePage(direction: "prev" | "next") {
+    if (
+      direction === "next" &&
+      next.value &&
+      currentPage.value < lastPage.value
+    ) {
+      await fetchPokemons(next.value);
+      currentPage.value += 1;
+    } else if (direction === "prev" && prev.value && currentPage.value > 1) {
+      await fetchPokemons(prev.value);
+      currentPage.value -= 1;
+    }
   }
 
   return {
@@ -121,9 +167,13 @@ export const usePokemonStore = defineStore("pokemons", () => {
     isMyTeamFull,
     prev,
     next,
+    currentPage,
+    lastPage,
+    pageRange,
     // Actions
     fetchPokemons,
     addToMyTeam,
     removeFromMyTeam,
+    changePage,
   };
 });
