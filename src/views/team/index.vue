@@ -11,7 +11,7 @@ const pokemonStore = usePokemonStore();
 const { myTeam } = storeToRefs(pokemonStore);
 </script>
 <template>
-  <div>
+  <div class="pt-4">
     <SectionTitle class="mb-8">My team</SectionTitle>
 
     <div v-if="myTeam.length === 0" class="flex flex-col items-center">

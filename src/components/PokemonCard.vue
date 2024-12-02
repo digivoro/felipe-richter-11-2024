@@ -63,8 +63,9 @@ function onToggleFromTeam() {
       <AppButton
         class="transition-all duration-150 rounded-full h-12 -mr-2 -mb-2 shadow shadow-[rgba(0,0,0,0.5)]"
         :class="{
-          'bg-success text-success-content': !isPokemonInTeam,
           'bg-error text-error-content': isPokemonInTeam,
+          'bg-warning text-primary-content': !isPokemonInTeam && isMyTeamFull,
+          'bg-success text-success-content': !isPokemonInTeam,
         }"
       >
         <template v-if="isPokemonInTeam || !isMyTeamFull" #icon>

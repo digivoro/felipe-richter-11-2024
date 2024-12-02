@@ -20,7 +20,7 @@ const selectedPokemon = computed<Pokemon | undefined>(() =>
 
 <template>
   <div v-if="selectedPokemon">
-    <div class="flex flex-col items-center mb-8">
+    <div class="flex flex-col items-center mb-12">
       <!-- Sprite -->
       <div
         class="bg-neutral w-full flex justify-center rounded-t-[3rem] relative h-20 mt-10"
@@ -39,21 +39,21 @@ const selectedPokemon = computed<Pokemon | undefined>(() =>
 
       <!-- ID + Name -->
       <div
-        class="flex text-2xl uppercase font-black italic w-full justify-center gap-1 bg-secondary rounded-b px-4 py-2 shadow-md shadow-[rgba(0,0,0,0.4)]"
+        class="flex text-3xl uppercase font-black italic w-full justify-center gap-1 bg-secondary rounded-b px-4 py-2 shadow-md shadow-[rgba(0,0,0,0.4)]"
       >
-        <p class="text-neutral-content">#{{ selectedPokemon?.id }}</p>
-        <h1 class="text-secondary-content">{{ selectedPokemon?.name }}</h1>
+        <p class="text-secondary-content">#{{ selectedPokemon?.id }}</p>
+        <h1 class="text-neutral-content">{{ selectedPokemon?.name }}</h1>
       </div>
     </div>
 
     <!-- Description -->
-    <div class="mb-8">
+    <div class="mb-12">
       <SectionTitle>Description</SectionTitle>
       <p>{{ selectedPokemon.description }}</p>
     </div>
 
     <!-- Types -->
-    <div class="mb-8">
+    <div class="mb-12">
       <SectionTitle>Types</SectionTitle>
 
       <div class="flex gap-1">
@@ -66,7 +66,7 @@ const selectedPokemon = computed<Pokemon | undefined>(() =>
     </div>
 
     <!-- Stats -->
-    <div class="mb-8">
+    <div class="mb-12">
       <SectionTitle>Stats</SectionTitle>
       <div class="uppercase text-sm mb-4">
         <ul class="leading-tight">

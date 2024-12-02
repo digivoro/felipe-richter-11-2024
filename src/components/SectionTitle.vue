@@ -10,7 +10,7 @@ import IconPokeball from "./icons/IconPokeball.vue";
     <div
       class="flex items-center gap-1 bg-secondary rounded px-2 py-1 ml-6 shadow-md shadow-[rgba(0,0,0,0.3)]"
     >
-      <h2 class="text-lg uppercase font-black text-secondary-content">
+      <h2 class="text-lg uppercase font-black text-white">
         <slot />
       </h2>
     </div>
