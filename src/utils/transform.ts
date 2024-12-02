@@ -5,6 +5,7 @@ import type {
   ApiSpeciesResponse,
   Pokemon,
 } from "@/types";
+import { cleanDescription } from "./helpers";
 
 export function transformPokemon(
   apiPokemon: ApiPokemonResponse,
@@ -20,7 +21,9 @@ export function transformPokemon(
     stats: stats.map((s) => ({ base: s.base_stat, name: s.stat.name })),
     sprite: sprites.front_default,
     cry: cries.latest,
-    description: apiSpecies.flavor_text_entries[0].flavor_text,
+    description: cleanDescription(
+      apiSpecies.flavor_text_entries[0].flavor_text,
+    ),
     types: types.map((t) => t.type.name),
     evolutionChain: transformEvolutionChain(apiEvolutionChain.chain),
   };
