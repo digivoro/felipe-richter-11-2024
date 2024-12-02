@@ -27,11 +27,12 @@ const { myTeam } = storeToRefs(pokemonStore);
         Add Pokémon
       </AppButton>
     </div>
-    <TeamPokemonCard
-      v-for="pokemon in myTeam"
-      :key="pokemon.id"
-      :pokemon="pokemon"
-      class="mb-8"
-    />
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+      <TeamPokemonCard
+        v-for="pokemon in myTeam"
+        :key="pokemon.id"
+        :pokemon="pokemon"
+      />
+    </div>
   </div>
 </template>

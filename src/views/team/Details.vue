@@ -20,6 +20,7 @@ const selectedPokemon = computed<Pokemon | undefined>(() =>
 
 <template>
   <div v-if="selectedPokemon">
+    <!-- Header -->
     <div class="flex flex-col items-center mb-12">
       <!-- Sprite -->
       <div
@@ -46,64 +47,75 @@ const selectedPokemon = computed<Pokemon | undefined>(() =>
       </div>
     </div>
 
-    <!-- Description -->
-    <div class="mb-12">
-      <SectionTitle>Description</SectionTitle>
-      <p>{{ selectedPokemon.description }}</p>
-    </div>
-
-    <!-- Types -->
-    <div class="mb-12">
-      <SectionTitle>Types</SectionTitle>
-
-      <div class="flex gap-1">
-        <TypeBadge
-          v-for="type in selectedPokemon?.types"
-          :key="type"
-          :type="type"
-        />
+    <!-- Data -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-20">
+      <!-- Description -->
+      <div>
+        <SectionTitle>Description</SectionTitle>
+        <p>{{ selectedPokemon.description }}</p>
       </div>
-    </div>
 
-    <!-- Stats -->
-    <div class="mb-12">
-      <SectionTitle>Stats</SectionTitle>
-      <div class="uppercase text-sm mb-4">
-        <ul class="leading-tight">
-          <li class="flex justify-between w-52">
-            <span class="font-bold">Height:</span>
-            {{ selectedPokemon.height }}
-          </li>
-          <li class="flex justify-between w-52">
-            <span class="font-bold">Weight:</span>
-            {{ selectedPokemon.weight }}
-          </li>
-          <li
-            v-for="stat in selectedPokemon.stats"
-            class="flex justify-between w-52"
+      <!-- Types -->
+      <div>
+        <SectionTitle>Types</SectionTitle>
+
+        <div class="flex gap-1">
+          <TypeBadge
+            v-for="type in selectedPokemon?.types"
+            :key="type"
+            :type="type"
+          />
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div>
+        <SectionTitle>Stats</SectionTitle>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Stats list -->
+          <div
+            class="uppercase text-sm mb-4 w-full bg-success text-base-300 p-4 rounded min-h-52 md:items-center place-content-center"
           >
-            <span class="font-bold">{{ stat.name }}:</span> {{ stat.base }}
-          </li>
-        </ul>
-      </div>
-      <div class="bg-neutral rounded">
-        <StatsChart :pokemon="selectedPokemon" />
-      </div>
-    </div>
+            <ul class="flex flex-col justify-around">
+              <li class="flex justify-between">
+                <span class="font-bold">Height:</span>
+                {{ selectedPokemon.height }}
+              </li>
+              <li class="flex justify-between">
+                <span class="font-bold">Weight:</span>
+                {{ selectedPokemon.weight }}
+              </li>
+              <li
+                v-for="stat in selectedPokemon.stats"
+                class="flex justify-between"
+              >
+                <span class="font-bold">{{ stat.name }}:</span> {{ stat.base }}
+              </li>
+            </ul>
+          </div>
 
-    <!-- Evolution chain -->
-    <div>
-      <SectionTitle>Evolution chain</SectionTitle>
-
-      <!-- No evo chain -->
-      <div v-if="selectedPokemon.evolutionChain.length === 0">
-        This Pokémon does not have an evolution chain
+          <!-- Stats chart -->
+          <div class="bg-neutral rounded h-52 flex items-center justify-center">
+            <StatsChart :pokemon="selectedPokemon" />
+          </div>
+        </div>
       </div>
 
-      <!--  -->
-      <div v-else>
-        <div v-for="pokemon in selectedPokemon.evolutionChain">
-          {{ pokemon.name }}
+      <!-- Evolution chain -->
+      <div>
+        <SectionTitle>Evolution chain</SectionTitle>
+
+        <!-- No evo chain -->
+        <div v-if="selectedPokemon.evolutionChain.length === 0">
+          This Pokémon does not have an evolution chain
+        </div>
+
+        <!--  -->
+        <div v-else>
+          <div v-for="pokemon in selectedPokemon.evolutionChain">
+            {{ pokemon.name }}
+          </div>
         </div>
       </div>
     </div>

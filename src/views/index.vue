@@ -38,15 +38,20 @@ onMounted(async () => {
     <div class="text-center uppercase mb-8 font-bold">
       Page {{ currentPage }}/{{ lastPage }}
     </div>
-    <PokemonCard
-      v-for="pokemon in pokemonStore.pokemons.slice(
-        pageRange.start,
-        pageRange.end,
-      )"
-      :key="pokemon.id"
-      class="mb-6"
-      :pokemon="pokemon"
-    />
+
+    <!-- Pokemon cards -->
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+    >
+      <PokemonCard
+        v-for="pokemon in pokemonStore.pokemons.slice(
+          pageRange.start,
+          pageRange.end,
+        )"
+        :key="pokemon.id"
+        :pokemon="pokemon"
+      />
+    </div>
   </div>
 
   <BottomNavBar @change-page="onChangePage" />
