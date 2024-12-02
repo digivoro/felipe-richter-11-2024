@@ -4,6 +4,7 @@ import type { Pokemon } from "@/types";
 import { computed } from "vue";
 import IconAdd from "./icons/IconAdd.vue";
 import { storeToRefs } from "pinia";
+import AppButton from "./AppButton.vue";
 
 const pokemonStore = usePokemonStore();
 const { addToMyTeam, removeFromMyTeam } = pokemonStore;
@@ -45,7 +46,7 @@ function onToggleFromTeam() {
     <div class="flex justify-between h-20 items-end">
       <!-- Name -->
       <div
-        class="flex flex-col ml-2 transition-all transform-gpu duration-150 uppercase"
+        class="flex flex-col ml-2 transition-all duration-150 uppercase"
         :class="{
           'text-3xl opacity-25 font-black text-[white] italic pokemon-name [paint-order:stroke_fill] [-webkit-text-stroke:10px_rgba(0,0,0,1)]':
             isPokemonInTeam,
@@ -59,39 +60,26 @@ function onToggleFromTeam() {
       </div>
 
       <!-- Button -->
-      <div
-        class="flex items-center transition-all transform-gpu rounded-full h-12 -mr-2 -mb-2 shadow shadow-[rgba(0,0,0,0.5)] border-b-2"
+      <AppButton
+        class="transition-all duration-150 rounded-full h-12 -mr-2 -mb-2 shadow shadow-[rgba(0,0,0,0.5)]"
         :class="{
           'bg-success text-success-content': !isPokemonInTeam,
           'bg-error text-error-content': isPokemonInTeam,
         }"
       >
-        <div
-          class="uppercase flex justify-between pl-4 pr-4 items-center w-32 text-xs text-center font-bold font-mono"
-        >
+        <template v-if="isPokemonInTeam || !isMyTeamFull" #icon>
           <IconAdd
-            v-if="isPokemonInTeam || !isMyTeamFull"
-            class="size-6 transition-all"
+            class="size-6 transition-all duration-150"
             :class="{
               'rotate-45': isPokemonInTeam,
               'rotate-0': !isPokemonInTeam,
             }"
           />
-
-          <div v-if="isPokemonInTeam">
-            Remove <br />
-            from team
-          </div>
-          <div v-else-if="isMyTeamFull" class="pl-6">
-            Team <br />
-            is full!
-          </div>
-          <div v-else>
-            Add to <br />
-            my team
-          </div>
-        </div>
-      </div>
+        </template>
+        <template v-if="isPokemonInTeam">Remove</template>
+        <template v-else-if="isMyTeamFull">Team is full!</template>
+        <template v-else>Add</template>
+      </AppButton>
     </div>
   </div>
 </template>
