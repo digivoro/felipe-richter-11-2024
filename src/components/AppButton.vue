@@ -24,7 +24,7 @@ const props = defineProps<{
     class="rounded-full px-4 py-2 uppercase text-md font-bold flex items-center justify-center"
     :to="to"
   >
-    <div class="mr-2">
+    <div v-if="$slots.icon" class="mr-2">
       <slot name="icon"></slot>
     </div>
     <slot />

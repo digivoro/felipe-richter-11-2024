@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppButton from "@/components/AppButton.vue";
 import IconAdd from "@/components/icons/IconAdd.vue";
 import IconInfo from "@/components/icons/IconInfo.vue";
 import SectionTitle from "@/components/SectionTitle.vue";
@@ -19,13 +20,12 @@ const { myTeam } = storeToRefs(pokemonStore);
         <p class="">You don't have any Pokémons in your team!</p>
       </div>
       <p class="font-medium mb-2">Start by adding one here:</p>
-      <RouterLink
-        to="/"
-        class="bg-secondary text-secondary-content flex items-center w-max rounded-full p-4"
-      >
-        <IconAdd class="size-5 mr-2" />
-        <div class="uppercase text-xs">Add Pokémon</div>
-      </RouterLink>
+      <AppButton to="/" class="bg-secondary text-secondary-content">
+        <template #icon>
+          <IconAdd class="size-5" />
+        </template>
+        Add Pokémon
+      </AppButton>
     </div>
     <TeamPokemonCard
       v-for="pokemon in myTeam"
